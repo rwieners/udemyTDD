@@ -18,6 +18,14 @@ public class ISBNValidatorTest {
 	}
 	
 	@Test
+	public void ISBNNumberIsEndingInAXAreValid(){
+		ISBNValidator validator = new ISBNValidator();
+		boolean result = validator.checkISBN("012000030X");
+		assertTrue(result);
+	}
+	
+	
+	@Test
 	public final void checkAInValidISBN() {	
 	ISBNValidator validator = new ISBNValidator();
 	
@@ -29,6 +37,12 @@ public class ISBNValidatorTest {
 	public void nineDigitISBNAreNotAllowed(){
 		ISBNValidator validator = new ISBNValidator();
 		validator.checkISBN("123456789");
+	}
+	
+	@Test(expected = NumberFormatException.class)
+	public void nonNumericISBNAreNotAllowed(){
+		ISBNValidator validator = new ISBNValidator();
+		validator.checkISBN("Helloworld");
 	}
 	
 
