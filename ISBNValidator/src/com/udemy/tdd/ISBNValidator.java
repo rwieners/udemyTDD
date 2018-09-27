@@ -1,7 +1,22 @@
 package com.udemy.tdd;
 
+import java.io.IOException;
+
 public class ISBNValidator {
 
+	
+	void main(String args[]){
+		
+		checkISBN("9876543212");
+		
+		System.out.println("Press Enter to continue...");
+	    try {
+			System.in.read();
+		} catch (IOException e) {e.printStackTrace();}
+	    		System.out.println("Finished.");
+		
+	}
+	
 	public boolean checkISBN(String isbn) {
 		
 		if (isbn.length() != 10)throw new NumberFormatException("ISBN muss 10 Zeichen haben");
@@ -30,6 +45,8 @@ public class ISBNValidator {
 		else
 			return false;
 	}
+	
+
 
 }
 
