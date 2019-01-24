@@ -5,7 +5,7 @@ import java.io.IOException;
 public class ISBNValidator {
 
 	
-	void main(String args[]){
+	public static void main(String args[]){
 		
 		checkISBN("9876543212");
 		
@@ -17,11 +17,12 @@ public class ISBNValidator {
 		
 	}
 	
-	public boolean checkISBN(String isbn) {
+	public static boolean checkISBN(String isbn) {
 		
 		if (isbn.length() != 10)throw new NumberFormatException("ISBN muss 10 Zeichen haben");
 		
-		int total =0;
+	
+		int total = 0;
 		
 		for(int i=0; i<10;i++){
 			
@@ -40,13 +41,12 @@ public class ISBNValidator {
 		}
 		
 		
-		if(total % 11 == 0)		
+		if(total % 11 == 0)	{
+			System.out.println("passt");
 			return true;
+		}
 		else
 			return false;
 	}
-	
-
-
 }
 
