@@ -45,7 +45,9 @@ public class ISBNValidator {
 			System.out.println("passt");
 			return true;
 		}
-		else
+		else {
+			System.out.println("passt ned");
+		}
 			return false;
 	}
 }
