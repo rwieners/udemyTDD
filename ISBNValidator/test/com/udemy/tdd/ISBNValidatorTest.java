@@ -45,5 +45,16 @@ public class ISBNValidatorTest {
 		validator.checkISBN("Helloworld");
 	}
 	
+	@Test(expected = NumberFormatException.class)
+	public void elevenDigitISBNAreNotAllowed(){
+		ISBNValidator validator = new ISBNValidator();
+		validator.checkISBN("01234567890");
+	}
+	
+	@Test(expected = NumberFormatException.class)
+	public void xInTheMiddleIsNotAllowed(){
+		ISBNValidator validator = new ISBNValidator();
+		validator.checkISBN("0140X49116");
+	}
 
 }
