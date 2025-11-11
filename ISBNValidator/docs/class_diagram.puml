@@ -1,0 +1,50 @@
+@startuml ISBNValidator_ClassDiagram
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333333
+skinparam arrowColor #666666
+
+package "com.udemy.tdd" {
+    class ISBNValidator {
+        {static} +main(args: String[]): void
+        {static} +checkISBN(isbn: String): boolean
+        
+        __
+        Validiert 10-stellige ISBN-Nummern
+        nach dem ISBN-10 Algorithmus
+    }
+
+    class ISBNValidatorTest {
+        +checkAValidISBN(): void
+        +ISBNNumberIsEndingInAXAreValid(): void
+        +checkAInValidISBN(): void
+        +nineDigitISBNAreNotAllowed(): void
+        +nonNumericISBNAreNotAllowed(): void
+        
+        __
+        Unit Tests für ISBNValidator
+        mit JUnit 4
+    }
+
+    ISBNValidatorTest ..> ISBNValidator : <<tests>>
+}
+
+note right of ISBNValidator
+    Stateless Utility-Klasse
+    • Keine Instanzvariablen
+    • Nur statische Methoden
+    • Wirft NumberFormatException
+      bei ungültiger Eingabe
+end note
+
+note right of ISBNValidatorTest
+    Test Coverage:
+    • Gültige ISBNs
+    • ISBNs mit 'X' am Ende
+    • Ungültige Prüfziffer
+    • Falsche Länge
+    • Nicht-numerische Zeichen
+end note
+
+@enduml

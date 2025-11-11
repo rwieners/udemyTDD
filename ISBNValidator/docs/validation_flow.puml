@@ -1,0 +1,49 @@
+@startuml ISBNValidator_ValidationFlow
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
+skinparam noteBkgColor #FFFFCC
+skinparam arrowColor #666666
+
+start
+
+:checkISBN(isbn: String);
+
+if (isbn.length() == 10?) then (Nein)
+    :throw NumberFormatException
+    ("ISBN muss 10 Zeichen haben");
+    end
+else (Ja)
+    :total = 0;
+    
+    :i = 0;
+    
+    while (i < 10?) is (Ja)
+        if (isbn.charAt(i).isDigit()?) then (Nein)
+            if (i == 9 && isbn.charAt(i) == 'X'?) then (Ja)
+                :total += 10;
+            else (Nein)
+                :throw NumberFormatException
+                ("ISBN muss aus Ziffern bestehen");
+                end
+            endif
+        else (Ja)
+            :value = getNumericValue(charAt(i));
+            :total += value * (10-i);
+        endif
+        
+        :i++;
+    endwhile (Nein)
+    
+    if (total % 11 == 0?) then (Ja)
+        :println("passt");
+        :return true;
+        end
+    else (Nein)
+        :println("passt ned");
+        :return false;
+        end
+    endif
+endif
+
+@enduml

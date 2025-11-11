@@ -1,0 +1,69 @@
+@startuml ISBNValidator_SequenceDiagram
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam sequenceActorBorderColor #333333
+skinparam sequenceActorBackgroundColor #F0F0F0
+skinparam arrowColor #666666
+skinparam noteBkgColor #FFFFCC
+
+actor JUnit as junit
+participant ISBNValidatorTest as test
+participant ISBNValidator as validator
+
+rect rgb(200, 220, 255)
+    note over junit, validator
+        Test: checkAValidISBN()
+    end note
+end
+
+junit -> test: checkAValidISBN()
+activate test
+
+test -> test: ISBNValidator validator = new ISBNValidator()
+note over test
+    Instanz erstellen
+    (obwohl Methoden statisch sind)
+end note
+
+test -> validator: checkISBN("0140449116")
+activate validator
+
+rect rgb(240, 255, 240)
+    note over validator
+        Validierung durchführen:
+        1. Länge prüfen
+        2. Zeichen iterieren
+        3. Prüfsumme berechnen
+        4. Modulo 11 prüfen
+    end note
+end
+
+validator -> validator: length check (== 10) ✓
+validator -> validator: iterate chars[0..9]
+loop für i=0 bis 9
+    validator -> validator: char.isDigit() ?
+    validator -> validator: total += digit * (10-i)
+end
+validator -> validator: print "passt"
+validator --> test: return true
+
+deactivate validator
+test -> test: assertTrue(result)
+note over test
+    Assertion erfolgreich:
+    true == true ✓
+end note
+deactivate test
+
+junit -> junit: Test PASSED
+
+rect rgb(255, 240, 240)
+    note over junit, validator
+        Ablauf bei ungültigem ISBN:
+        • NumberFormatException wird geworfen
+        • Test erwartet Exception
+        • Test PASSED
+    end note
+end
+
+@enduml
