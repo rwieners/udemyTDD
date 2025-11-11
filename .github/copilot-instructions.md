@@ -1,45 +1,58 @@
 # GitHub Copilot Instructions - ISBNValidator
 
-## Projektübersicht
+## 📖 Projektübersicht
 
-**ISBNValidator** ist ein TDD-Lernprojekt in Java zur Validierung von 10-stelligen ISBN-Nummern. Es dient als praktische Demonstration von Test-Driven Development Prinzipien.
+**ISBNValidator** ist ein TDD-Lernprojekt in Java zur Validierung von 10-stelligen ISBN-Nummern. Es dient als praktische Demonstration von Test-Driven Development Prinzipien mit fokussierter Codebase.
 
-### Struktur
-- `ISBNValidator/src/com/udemy/tdd/ISBNValidator.java` - Hauptimplementierung (stateless Utility-Klasse)
-- `ISBNValidator/test/com/udemy/tdd/ISBNValidatorTest.java` - JUnit 4 Tests
-- `ISBNValidator/bin/` - Kompilierte Klassen
+**Basierte auf:** Java 21 LTS, JUnit 4, Eclipse IDE-basiertes Projekt
 
-## Kritische Patterns
+### Projektstruktur
+```
+ISBNValidator/
+├── src/com/udemy/tdd/ISBNValidator.java      # Stateless Validator (eine Klasse, zwei Methoden)
+├── test/com/udemy/tdd/ISBNValidatorTest.java # 5 Unit Tests
+├── docs/                                      # PlantUML Diagramme
+│   ├── class_diagram.puml
+│   ├── sequence_diagram_test.puml
+│   └── validation_flow.puml
+├── bin/                                       # Kompilierte Klassen
+├── .classpath, .project                       # Eclipse-Metadaten
+└── .settings/                                 # IDE-Konfiguration
+```
+
+## 🎯 Kernkonzepte
 
 ### ISBN-10 Validierungsalgorithmus
 
-Die Kernlogik in `checkISBN()`:
-```java
-// 1. Länge validieren (genau 10 Zeichen)
-// 2. Für jeden Character i (0-9):
-//    - Char 0-8: muss Ziffer sein → value * (10-i) addieren
-//    - Char 9: kann Ziffer sein ODER 'X' (Wert 10)
-// 3. Summe % 11 == 0 → gültig
-```
+In `checkISBN(String isbn)`:
+1. **Längenkontrolle**: Exakt 10 Zeichen → `NumberFormatException` bei Abweichung
+2. **Zeichenverarbeitung** (für Index i = 0..9):
+   - Zeichen 0-8: Muss Ziffer sein, Beitrag: `digit_value × (10-i)`
+   - Zeichen 9: Ziffer ODER 'X' (=10) erlaubt
+3. **Prüfsumme**: `sum % 11 == 0` → validiert als `true`, andernfalls `false`
 
-**Wichtige Besonderheiten:**
-- 'X' ist **nur** an Position 9 erlaubt
-- `NumberFormatException` für ungültige Länge/Zeichen (nicht `IllegalArgumentException`)
-- Methode gibt `true`/`false` zurück UND schreibt "passt"/"passt ned" zu stdout
+**Beobachtete Verhaltensweise:**
+- `true`/`false` wird zurückgegeben **UND** "passt"/"passt ned" wird zu stdout geschrieben
+- Fehlerbehandlung: `NumberFormatException` (nicht `IllegalArgumentException`)
+- 'X' funktioniert **nur** an Position 9
 
-### TDD-Ansatz erkennbar
+### TDD-Struktur
 
-Die Tests zeigen den iterativen Entwicklungsprozess:
-- Positive Tests (gültige ISBNs) vor Exception-Tests
-- Spezifische Szenarien isoliert testen (z.B. 'X'-Handling)
-- `@Test(expected = NumberFormatException.class)` für Exception-Validierung
+Die Tests zeigen klassischen TDD-Iterationsprozess:
+- **Positive Tests**: `checkAValidISBN()` mit zwei Testfällen
+- **Edge Cases**: `ISBNNumberIsEndingInAXAreValid()` isoliert 'X'-Verhalten
+- **Negative Tests**: `checkAInValidISBN()` (falsche Prüfsumme)
+- **Exception-Tests**: `nineDigitISBNAreNotAllowed()`, `nonNumericISBNAreNotAllowed()`
+- **Exception-Muster**: `@Test(expected = NumberFormatException.class)`
 
-## Entwickler-Workflows
+## 🔧 Kritische Entwickler-Workflows
 
-### Tests kompilieren und ausführen
+### Kompilation und Testausführung
+
 ```bash
 cd ISBNValidator
-# Kompilieren (benötigt junit-4.13.jar in lib/)
+
+# Kompilieren (mit JUnit auf Classpath)
 javac -d bin -cp lib/junit-4.13.jar \
   test/com/udemy/tdd/*.java src/com/udemy/tdd/*.java
 
@@ -48,44 +61,71 @@ java -cp bin:lib/junit-4.13.jar \
   org.junit.runner.JUnitCore com.udemy.tdd.ISBNValidatorTest
 ```
 
-### Hauptklasse ausführen
+### Hauptklasse direkt ausführen
+
 ```bash
 javac -d bin src/com/udemy/tdd/ISBNValidator.java
 java -cp bin com.udemy.tdd.ISBNValidator
 ```
 
-## Wichtige Conventions
+**Hinweis**: Die `main()`-Methode wartet auf Benutzereingabe (`System.in.read()`).
 
-1. **Stateless Design**: `ISBNValidator` hat keine Instanzvariablen; Methoden sind statisch
-2. **Fehlerbehandlung**: `NumberFormatException` mit deutschen Fehlermeldungen werfen
-3. **Console Output**: `System.out.println()` in `checkISBN()` ist beabsichtigt (zeigt Validierungsergebnis)
-4. **Package-Namen**: `com.udemy.tdd` - vollständiger Qualified Name nutzen
-5. **Test-Struktur**: Ein `@Test` pro Szenario; `ISBNValidator`-Instanz in jedem Test
+## 📋 Projekt-Spezifische Conventions
 
-## Integration & Abhängigkeiten
+| Aspekt | Konvention | Grund |
+|--------|-----------|-------|
+| **Design** | Stateless Utility (`ISBNValidator`) | Einfachheit, keine State-Verwaltung |
+| **Exceptions** | `NumberFormatException` (nicht `IllegalArgumentException`) | Differenziert zwischen Parsing/Format-Fehler |
+| **Fehlermeldungen** | Deutsche Texte ("ISBN muss 10 Zeichen haben") | Deutsches Lernprojekt |
+| **Ausgabe** | `System.out.println()` in Validierungslogik | Beabsichtigte Rückmeldung an Benutzer |
+| **Package** | `com.udemy.tdd` | Standard Udemy-Beispiel Pattern |
+| **Test-Instanzen** | `new ISBNValidator()` in jedem Test | Explizite Sichtbarkeit des getesteten Objekts |
 
-- **JUnit 4** - Testing Framework (junit-4.13.jar)
-- **Keine externen Dependencies** für Produktionscode
-- **Keine Dateisystem-Zugriffe** - nur In-Memory Validierung
-
-## Häufige Aufgaben
+## 🚀 Häufige Aufgaben & Patterns
 
 ### Neue Tests hinzufügen
-- Pattern: `@Test public void testDescriptionHere() { ... }`
-- Exception-Tests: `@Test(expected = NumberFormatException.class)`
-- Assertions: `assertTrue()`, `assertFalse()` von JUnit
+```java
+@Test
+public void testYourScenario() {
+    ISBNValidator validator = new ISBNValidator();
+    boolean result = validator.checkISBN("0123456789");
+    assertTrue(result);
+}
+
+@Test(expected = NumberFormatException.class)
+public void testInvalidCase() {
+    ISBNValidator validator = new ISBNValidator();
+    validator.checkISBN("invalid");
+}
+```
 
 ### Algorithmische Änderungen
-- Änderungen in `checkISBN()` müssen alle 5 bestehenden Tests erfüllen
-- Reihenfolge: Längenprüfung → Zeichenprüfung → Prüfsummenberechnung
 
-### Dokumentation erweitern
-- PlantUML Diagramme in `ISBNValidator/docs/` speichern
-- Siehe `class_diagram.puml`, `sequence_diagram_test.puml`, `validation_flow.puml`
+- **Vor Änderungen**: Alle 5 Tests müssen grün sein
+- **Änderungsreihenfolge**: Längenkontrolle → Zeichentyp → Checksum-Logik
+- **Nach Änderungen**: Testen mit: `checkAValidISBN()`, `ISBNNumberIsEndingInAXAreValid()`, andere Tests
 
-## Anti-Patterns zu vermeiden
+### Dokumentation (PlantUML)
 
-- ❌ Nicht-deutscher Text in Fehlermeldungen (Projekt verwendet Deutsch)
-- ❌ Neue Klassen/Methoden ohne entsprechende Tests
-- ❌ Änderung der Exception-Typen ohne Test-Anpassung
-- ❌ Hardcodierte Testdaten außerhalb von Testmethoden
+Diagramme speichern in `ISBNValidator/docs/`:
+- `class_diagram.puml` - Klassenstruktur
+- `sequence_diagram_test.puml` - Test-Ausführungsfluss
+- `validation_flow.puml` - Entscheidungslogik
+
+## ❌ Anti-Patterns (vermeiden)
+
+| Problem | Folge |
+|---------|--------|
+| Nicht-deutsche Fehlertext | Inkonsistent mit Projektsprache |
+| Änderung zu `IllegalArgumentException` | Tests brechen |
+| Statische Testdaten außerhalb von Tests | Schwer zu verstehen, welche Tests davon abhängen |
+| Neue öffentliche Methoden ohne Tests | Nicht im TDD-Spirit |
+| Entfernung von `System.out.println()` | Bricht Benutzer-Feedback-Mechanismus |
+
+## 🔗 Zusammenfassung für KI-Agents
+
+1. **Minimales Projekt**: Nur zwei Java-Klassen, fokussiert auf ISBN-Validierung
+2. **Keine Abhängigkeiten außer JUnit**: Produktionscode hat null externe Dependencies
+3. **Explizite Kompilation erforderlich**: Kein Maven/Gradle, manuelle `javac`-Aufrufe
+4. **Stdout ist Feature**: `System.out.println()` ist beabsichtigte Benutzer-Rückmeldung
+5. **German-centric**: Alle Fehlermeldungen auf Deutsch, sogar Variablennamen können Deutsch sein
